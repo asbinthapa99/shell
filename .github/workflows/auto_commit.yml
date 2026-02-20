@@ -35,7 +35,7 @@ jobs:
 
           echo $DAY > day_count.txt
 
-          TODAY=$(date '+%Y-%m-%dT%H:%M:%S')
+          TODAY=$(date '+%Y-%m-%d %H:%M:%S')
           echo "Day $DAY - $TODAY" >> README.md
 
           echo "DAY=$DAY" >> "$GITHUB_ENV"
