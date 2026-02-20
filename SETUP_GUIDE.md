@@ -4,6 +4,15 @@ A self-modifying script that automatically commits and pushes every 11 hours 24/
 
 ## How It Works
 
+### GitHub Actions (Recommended — Cloud-based, always reliable)
+
+- `.github/workflows/auto_commit.yml` — Scheduled workflow that runs every 11 hours on GitHub's servers
+  - No local daemon or credentials needed
+  - Works even when your laptop is off
+  - Uses the built-in `GITHUB_TOKEN` for authentication
+
+### macOS LaunchDaemon (Local — Requires laptop to be on and credentials configured)
+
 - `auto_commit.sh` - Main script that self-modifies, tracks days, and commits
 - `com.user.autocommit.daemon.plist` - macOS LaunchDaemon (runs every 11 hours automatically, 24/7)
 - `day_count.txt` - Tracks which day you're on
@@ -11,9 +20,10 @@ A self-modifying script that automatically commits and pushes every 11 hours 24/
 
 ## Current Setup
 
-✅ **LaunchDaemon active** — Runs as system daemon  
+✅ **GitHub Actions workflow active** — Runs on GitHub's cloud every 11 hours  
 ✅ **24/7 operation** — Works even with laptop closed/off  
-✅ **Every 11 hours** — Automatic commits (39,600 seconds)  
+✅ **Every 11 hours** — Automatic commits (cron: `0 */11 * * *`)  
+✅ **No credentials required** — Uses built-in `GITHUB_TOKEN`  
 ✅ **Already running** — Latest commit: Day 8
 
 ## What Happens Automatically

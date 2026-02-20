@@ -7,6 +7,8 @@
 # Setup environment for cron/launchd execution
 export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export HOME="/Users/user"
+# Prevent git from hanging waiting for credentials in non-interactive daemon mode
+export GIT_TERMINAL_PROMPT=0
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="$SCRIPT_DIR/auto_commit.sh.log"
