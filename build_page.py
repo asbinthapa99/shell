@@ -1,0 +1,189 @@
+import sys
+import os
+
+day         = os.environ.get("DAY", "0")
+now         = os.environ.get("NOW", "")
+label       = os.environ.get("LABEL", "")
+quote       = os.environ.get("QUOTE", "")
+author      = os.environ.get("AUTHOR", "")
+content_label = os.environ.get("CONTENT_LABEL", "")
+content_value = os.environ.get("CONTENT_VALUE", "")
+btc_price   = os.environ.get("BTC_PRICE", "—")
+total       = os.environ.get("TOTAL", "0")
+
+# Read last 10 lines of commit log
+rows = ""
+try:
+    with open("commit_log.txt", "r") as f:
+        lines = f.readlines()
+    for line in lines[-10:]:
+        parts = line.strip().split("|")
+        parts = [p.strip() for p in parts if p.strip()]
+        if len(parts) >= 4:
+            rows += f"""
+            <tr>
+              <td>{parts[0]}</td>
+              <td>{parts[1]}</td>
+              <td><span class='badge'>{parts[2]}</span></td>
+              <td>{parts[3]}</td>
+            </tr>"""
+except Exception:
+    rows = "<tr><td colspan='4'>No log yet</td></tr>"
+
+html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="refresh" content="300"/>
+  <title>Asbin's Streak Tracker</title>
+  <style>
+    * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+    body {{
+      font-family: 'Segoe UI', sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }}
+    header {{
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 2.5rem 1rem;
+      text-align: center;
+    }}
+    header .fire {{ font-size: 3rem; }}
+    header h1 {{ font-size: 2rem; color: #58a6ff; margin-top: 0.5rem; }}
+    header p  {{ color: #8b949e; margin-top: 0.5rem; font-size: 0.95rem; }}
+    .container {{ max-width: 900px; margin: 2rem auto; padding: 0 1rem; }}
+    .grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }}
+    .card {{
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }}
+    .card .label {{ font-size: 0.72rem; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }}
+    .card .value {{ font-size: 1.8rem; font-weight: 700; color: #58a6ff; margin-top: 0.25rem; }}
+    .card .sub   {{ font-size: 0.8rem; color: #8b949e; margin-top: 0.25rem; }}
+    .section {{
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }}
+    .section h2 {{
+      font-size: 0.78rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #30363d;
+      padding-bottom: 0.5rem;
+    }}
+    .quote-text   {{ font-size: 1.15rem; color: #e6edf3; line-height: 1.7; font-style: italic; }}
+    .quote-author {{ color: #58a6ff; margin-top: 0.75rem; font-size: 0.9rem; }}
+    .btc-price    {{ font-size: 2.2rem; font-weight: 700; color: #f7931a; }}
+    table  {{ width: 100%; border-collapse: collapse; font-size: 0.85rem; }}
+    th     {{ text-align: left; padding: 0.6rem 0.75rem; color: #8b949e; border-bottom: 1px solid #30363d; }}
+    td     {{ padding: 0.6rem 0.75rem; border-bottom: 1px solid #21262d; color: #c9d1d9; vertical-align: top; }}
+    tr:last-child td {{ border-bottom: none; }}
+    .badge {{
+      background: #1f6feb22;
+      color: #58a6ff;
+      border: 1px solid #1f6feb55;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }}
+    footer {{
+      text-align: center;
+      color: #8b949e;
+      font-size: 0.8rem;
+      padding: 2rem 1rem;
+      border-top: 1px solid #21262d;
+      margin-top: 1rem;
+    }}
+    footer a {{ color: #58a6ff; text-decoration: none; }}
+    footer a:hover {{ text-decoration: underline; }}
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="fire">🔥</div>
+    <h1>Asbin's Streak Tracker</h1>
+    <p>Automatically updated 5 times daily &nbsp;·&nbsp; Powered by GitHub Actions</p>
+  </header>
+
+  <div class="container">
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">Current Day</div>
+        <div class="value">{day}</div>
+        <div class="sub">days straight</div>
+      </div>
+      <div class="card">
+        <div class="label">Total Commits</div>
+        <div class="value">{total}</div>
+        <div class="sub">and counting</div>
+      </div>
+      <div class="card">
+        <div class="label">Bitcoin</div>
+        <div class="value" style="color:#f7931a; font-size:1.1rem;">${btc_price}</div>
+        <div class="sub">USD live</div>
+      </div>
+      <div class="card">
+        <div class="label">Session</div>
+        <div class="value" style="font-size:1.1rem;">{label}</div>
+        <div class="sub">{now} UTC</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>{content_label}</h2>
+      <div class="quote-text">"{quote}"</div>
+      <div class="quote-author">— {author}</div>
+    </div>
+
+    <div class="section">
+      <h2>Recent Commit Log</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Timestamp</th>
+            <th>Session</th>
+            <th>Content</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <footer>
+    Last updated: {now} UTC &nbsp;·&nbsp;
+    <a href="https://github.com/asbinthapa99/shell">View on GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/asbinthapa99">@asbinthapa99</a>
+  </footer>
+
+</body>
+</html>"""
+
+with open("index.html", "w") as f:
+    f.write(html)
+
+print("index.html written successfully")
