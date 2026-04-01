@@ -9,8 +9,8 @@
 | | |
 |---|---|
 | **Current Day** | Day 134 |
-| **Last Updated** | 2026-04-01 19:03:30 UTC |
-| **Total Commits** | 166 |
+| **Last Updated** | 2026-04-01 21:45:12 UTC |
+| **Total Commits** | 167 |
 | **Started** | 2026-02-17 |
 | **Live Page** | [asbinthapa99.github.io/shell](https://asbinthapa99.github.io/shell) |
 
@@ -18,7 +18,7 @@
 
 ## Word of the Session
 
-> prevocalic - Immediately preceding a vowel or vowel sound
+> wracked - To place in or hang on a rack.
 
 ---
 
@@ -35,6 +35,7 @@
 | Day 134 | 2026-04-01 12:51:29 | Midday | BTC unavailable USD as of unavailable |
 | Day 134 | 2026-04-01 16:05:37 | Evening | BTC unavailable USD as of unavailable |
 | Day 134 | 2026-04-01 19:03:30 | Night | prevocalic - Immediately preceding a vowel or vowel sound |
+| Day 134 | 2026-04-01 21:45:12 | Night | wracked - To place in or hang on a rack. |
 
 ---
 
