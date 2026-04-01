@@ -28,11 +28,14 @@ jobs:
           git config user.name "asbinthapa99"
           git config user.email "asbinthapa27@gmail.com"
 
-      - name: Morning - increment day and get quote
-        if: ${{ contains('0 9', github.event.schedule) || (github.event_name == 'workflow_dispatch') }}
+      - name: Build commit content and update README
         run: |
           HOUR=$(date '+%H')
-          if [ "$HOUR" -lt 11 ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          NOW=$(date '+%Y-%m-%d %H:%M:%S')
+
+          # ── Morning: increment day + quote ───────────────────────────────
+          if [ "$HOUR" -lt 11 ]; then
+            LABEL="Morning"
             if [ -f "day_count.txt" ]; then
               DAY=$(cat day_count.txt)
               DAY=$((DAY + 1))
@@ -40,89 +43,97 @@ jobs:
               DAY=1
             fi
             echo $DAY > day_count.txt
-            echo "DAY=$DAY" >> "$GITHUB_ENV"
-            echo "LABEL=Morning" >> "$GITHUB_ENV"
+
             RESPONSE=$(curl -sf https://zenquotes.io/api/random || echo "")
             if [ -n "$RESPONSE" ]; then
               QUOTE=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin)[0]; print(d['q'])")
               AUTHOR=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin)[0]; print(d['a'])")
             else
-              QUOTE="Keep pushing forward."
+              QUOTE="Keep pushing forward, one commit at a time."
               AUTHOR="Unknown"
             fi
-            echo "CONTENT_LABEL=Quote of the Day" >> "$GITHUB_ENV"
-            echo "CONTENT_VALUE=$QUOTE - $AUTHOR" >> "$GITHUB_ENV"
-            echo "COMMIT_MSG=Day $DAY | Morning | $QUOTE - $AUTHOR" >> "$GITHUB_ENV"
-          fi
+            CONTENT_LABEL="Quote of the Day"
+            CONTENT_VALUE="$QUOTE - $AUTHOR"
+            COMMIT_MSG="Day $DAY | Morning | $QUOTE - $AUTHOR"
 
-      - name: Determine session type
-        run: |
-          HOUR=$(date '+%H')
-          NOW=$(date '+%Y-%m-%d %H:%M:%S')
-          echo "NOW=$NOW" >> "$GITHUB_ENV"
-
-          if [ -z "$DAY" ]; then
+          # ── Midday: bitcoin price ─────────────────────────────────────────
+          elif [ "$HOUR" -lt 13 ]; then
+            LABEL="Midday"
             DAY=$(cat day_count.txt)
-            echo "DAY=$DAY" >> "$GITHUB_ENV"
+            BTC=$(curl -sf "https://api.coindesk.com/v1/bpi/currentprice/USD.json" || echo "")
+            if [ -n "$BTC" ]; then
+              BTC_PRICE=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['bpi']['USD']['rate'])")
+              BTC_TIME=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['time']['updated'])")
+            else
+              BTC_PRICE="unavailable"
+              BTC_TIME="unavailable"
+            fi
+            CONTENT_LABEL="Bitcoin Price"
+            CONTENT_VALUE="BTC $BTC_PRICE USD — $BTC_TIME"
+            COMMIT_MSG="Day $DAY | Midday | BTC $BTC_PRICE USD"
+
+          # ── Afternoon: random word ────────────────────────────────────────
+          elif [ "$HOUR" -lt 16 ]; then
+            LABEL="Afternoon"
+            DAY=$(cat day_count.txt)
+            WORD_RES=$(curl -sf "https://random-word-api.herokuapp.com/word" || echo "")
+            if [ -n "$WORD_RES" ]; then
+              WORD=$(echo "$WORD_RES" | python3 -c "import sys,json; print(json.load(sys.stdin)[0])")
+            else
+              WORD="perseverance"
+            fi
+            DEF_RES=$(curl -sf "https://api.dictionaryapi.dev/api/v2/entries/en/$WORD" || echo "")
+            if [ -n "$DEF_RES" ]; then
+              DEF=$(echo "$DEF_RES" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0]['meanings'][0]['definitions'][0]['definition'])" 2>/dev/null || echo "No definition found.")
+            else
+              DEF="No definition found."
+            fi
+            CONTENT_LABEL="Word of the Session"
+            CONTENT_VALUE="$WORD — $DEF"
+            COMMIT_MSG="Day $DAY | Afternoon | Word: $WORD"
+
+          # ── Evening: bitcoin price ────────────────────────────────────────
+          elif [ "$HOUR" -lt 19 ]; then
+            LABEL="Evening"
+            DAY=$(cat day_count.txt)
+            BTC=$(curl -sf "https://api.coindesk.com/v1/bpi/currentprice/USD.json" || echo "")
+            if [ -n "$BTC" ]; then
+              BTC_PRICE=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['bpi']['USD']['rate'])")
+              BTC_TIME=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['time']['updated'])")
+            else
+              BTC_PRICE="unavailable"
+              BTC_TIME="unavailable"
+            fi
+            CONTENT_LABEL="Bitcoin Price"
+            CONTENT_VALUE="BTC $BTC_PRICE USD — $BTC_TIME"
+            COMMIT_MSG="Day $DAY | Evening | BTC $BTC_PRICE USD"
+
+          # ── Night: random word ────────────────────────────────────────────
+          else
+            LABEL="Night"
+            DAY=$(cat day_count.txt)
+            WORD_RES=$(curl -sf "https://random-word-api.herokuapp.com/word" || echo "")
+            if [ -n "$WORD_RES" ]; then
+              WORD=$(echo "$WORD_RES" | python3 -c "import sys,json; print(json.load(sys.stdin)[0])")
+            else
+              WORD="consistency"
+            fi
+            DEF_RES=$(curl -sf "https://api.dictionaryapi.dev/api/v2/entries/en/$WORD" || echo "")
+            if [ -n "$DEF_RES" ]; then
+              DEF=$(echo "$DEF_RES" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0]['meanings'][0]['definitions'][0]['definition'])" 2>/dev/null || echo "No definition found.")
+            else
+              DEF="No definition found."
+            fi
+            CONTENT_LABEL="Word of the Session"
+            CONTENT_VALUE="$WORD — $DEF"
+            COMMIT_MSG="Day $DAY | Night | Word: $WORD"
           fi
 
-          if [ "$HOUR" -ge 11 ] && [ "$HOUR" -lt 13 ]; then
-            echo "SESSION=btc" >> "$GITHUB_ENV"
-            echo "LABEL=Midday" >> "$GITHUB_ENV"
-          elif [ "$HOUR" -ge 13 ] && [ "$HOUR" -lt 16 ]; then
-            echo "SESSION=word" >> "$GITHUB_ENV"
-            echo "LABEL=Afternoon" >> "$GITHUB_ENV"
-          elif [ "$HOUR" -ge 16 ] && [ "$HOUR" -lt 19 ]; then
-            echo "SESSION=btc" >> "$GITHUB_ENV"
-            echo "LABEL=Evening" >> "$GITHUB_ENV"
-          elif [ "$HOUR" -ge 19 ]; then
-            echo "SESSION=word" >> "$GITHUB_ENV"
-            echo "LABEL=Night" >> "$GITHUB_ENV"
-          else
-            echo "SESSION=morning" >> "$GITHUB_ENV"
-          fi
-
-      - name: Fetch Bitcoin price
-        if: env.SESSION == 'btc'
-        run: |
-          DAY=$(cat day_count.txt)
-          BTC_RESPONSE=$(curl -sf "https://api.coindesk.com/v1/bpi/currentprice/USD.json" || echo "")
-          if [ -n "$BTC_RESPONSE" ]; then
-            BTC_PRICE=$(echo "$BTC_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['bpi']['USD']['rate'])")
-            BTC_TIME=$(echo "$BTC_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['time']['updated'])")
-          else
-            BTC_PRICE="N/A"
-            BTC_TIME="unavailable"
-          fi
-          echo "CONTENT_LABEL=Bitcoin Price" >> "$GITHUB_ENV"
-          echo "CONTENT_VALUE=BTC $BTC_PRICE USD as of $BTC_TIME" >> "$GITHUB_ENV"
-          echo "COMMIT_MSG=Day $DAY | $LABEL | BTC $BTC_PRICE USD" >> "$GITHUB_ENV"
-
-      - name: Fetch random word
-        if: env.SESSION == 'word'
-        run: |
-          DAY=$(cat day_count.txt)
-          WORD_RESPONSE=$(curl -sf "https://random-word-api.herokuapp.com/word" || echo "")
-          if [ -n "$WORD_RESPONSE" ]; then
-            WORD=$(echo "$WORD_RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin)[0])")
-          else
-            WORD="perseverance"
-          fi
-          DEF_RESPONSE=$(curl -sf "https://api.dictionaryapi.dev/api/v2/entries/en/$WORD" || echo "")
-          if [ -n "$DEF_RESPONSE" ]; then
-            DEFINITION=$(echo "$DEF_RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d[0]['meanings'][0]['definitions'][0]['definition'])" 2>/dev/null || echo "No definition found.")
-          else
-            DEFINITION="No definition found."
-          fi
-          echo "CONTENT_LABEL=Word of the Session" >> "$GITHUB_ENV"
-          echo "CONTENT_VALUE=$WORD - $DEFINITION" >> "$GITHUB_ENV"
-          echo "COMMIT_MSG=Day $DAY | $LABEL | Word: $WORD - $DEFINITION" >> "$GITHUB_ENV"
-
-      - name: Update README
-        run: |
-          DAY=$(cat day_count.txt)
-          TOTAL=$(git rev-list --count HEAD)
+          # ── Write commit log ──────────────────────────────────────────────
           echo "| Day $DAY | $NOW | $LABEL | $CONTENT_VALUE |" >> commit_log.txt
+
+          # ── Build README ──────────────────────────────────────────────────
+          TOTAL=$(git rev-list --count HEAD)
           {
             echo "# Streak Tracker"
             echo ""
@@ -157,6 +168,9 @@ jobs:
             echo ""
             echo "*Daily consistency challenge. Powered by GitHub Actions.*"
           } > README.md
+
+          # ── Export for commit step ────────────────────────────────────────
+          echo "COMMIT_MSG=$COMMIT_MSG" >> "$GITHUB_ENV"
 
       - name: Commit and push
         run: |
