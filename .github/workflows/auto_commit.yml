@@ -2,9 +2,8 @@ name: Auto Commit
 
 on:
   schedule:
-    # Runs every 11 hours (matches the LaunchDaemon interval)
-    - cron: '0 */11 * * *'
-  workflow_dispatch: # Allow manual trigger
+    - cron: '0 9 * * *'  # 9:00 AM UTC every day
+  workflow_dispatch:      # Allow manual trigger
 
 permissions:
   contents: write
@@ -26,6 +25,16 @@ jobs:
 
       - name: Increment day counter and update README
         run: |
+          TODAY_DATE=$(date '+%Y-%m-%d')
+
+          # Skip if already committed today
+          if grep -q "$TODAY_DATE" README.md 2>/dev/null; then
+            echo "Already committed today ($TODAY_DATE), skipping."
+            echo "SKIP=true" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          # Increment day counter
           if [ -f day_count.txt ]; then
             DAY=$(cat day_count.txt)
             DAY=$((DAY + 1))
@@ -40,8 +49,10 @@ jobs:
 
           echo "DAY=$DAY" >> "$GITHUB_ENV"
           echo "TODAY=$TODAY" >> "$GITHUB_ENV"
+          echo "SKIP=false" >> "$GITHUB_ENV"
 
       - name: Commit and push
+        if: env.SKIP != 'true'
         run: |
           git add day_count.txt README.md
           git diff --staged --quiet || git commit -m "auto-commit: Day $DAY at $TODAY"
