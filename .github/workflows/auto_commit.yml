@@ -51,62 +51,63 @@ jobs:
               DAY=1
             fi
             echo $DAY > day_count.txt
-            LABEL="🌅 Morning"
+            LABEL="Morning"
           else
             DAY=$(cat day_count.txt)
-            LABEL="🌙 Evening"
+            LABEL="Evening"
           fi
 
           echo "DAY=$DAY" >> "$GITHUB_ENV"
           echo "NOW=$NOW" >> "$GITHUB_ENV"
           echo "LABEL=$LABEL" >> "$GITHUB_ENV"
 
+          # Get total commits before writing
+          TOTAL=$(git rev-list --count HEAD)
+
+          # Add to commit log
           echo "| Day $DAY | $NOW | $LABEL | $QUOTE — $AUTHOR |" >> commit_log.txt
 
-          cat > README.md << EOF
-# 🔥 Streak Tracker
-
-> Automatically updated twice daily. Every commit counts.
-
----
-
-## 📊 Stats
-
-| | |
-|---|---|
-| **Current Day** | Day $DAY |
-| **Last Updated** | $NOW UTC |
-| **Total Commits** | $(git rev-list --count HEAD) |
-| **Started** | 2026-02-17 |
-
----
-
-## 💬 Quote of the Commit
-
-> "$QUOTE"
->
-> — *$AUTHOR*
-
----
-
-## 📅 Recent Commit Log
-
-| Day | Timestamp | Session | Quote |
-|-----|-----------|---------|-------|
-EOF
-
-          tail -10 commit_log.txt >> README.md
-
-          cat >> README.md << EOF
-
----
-
-*This repository is part of a daily consistency challenge. Powered by GitHub Actions.*
-EOF
+          # Build README line by line — no heredoc to avoid yaml/shell issues
+          {
+            echo "# Streak Tracker"
+            echo ""
+            echo "> Automatically updated twice daily. Every commit counts."
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Stats"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| **Current Day** | Day $DAY |"
+            echo "| **Last Updated** | $NOW UTC |"
+            echo "| **Total Commits** | $TOTAL |"
+            echo "| **Started** | 2026-02-17 |"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Quote of the Commit"
+            echo ""
+            echo "> $QUOTE"
+            echo ">"
+            echo "> — *$AUTHOR*"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Recent Commit Log"
+            echo ""
+            echo "| Day | Timestamp | Session | Quote |"
+            echo "|-----|-----------|---------|-------|"
+            tail -10 commit_log.txt
+            echo ""
+            echo "---"
+            echo ""
+            echo "*This repository is part of a daily consistency challenge. Powered by GitHub Actions.*"
+          } > README.md
 
       - name: Commit and push
         run: |
           git add day_count.txt README.md commit_log.txt
           git diff --staged --quiet && exit 0
-          git commit -m "Day $DAY | $LABEL | \"$QUOTE\" — $AUTHOR"
+          git commit -m "Day $DAY | $LABEL | $QUOTE - $AUTHOR"
           git push https://asbinthapa99:${{ secrets.GH_PAT }}@github.com/asbinthapa99/shell.git HEAD:main
