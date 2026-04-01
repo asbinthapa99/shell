@@ -8,9 +8,9 @@
 
 | | |
 |---|---|
-| **Current Day** | Day 133 |
-| **Last Updated** | 2026-04-01 01:11:35 UTC |
-| **Total Commits** | 162 |
+| **Current Day** | Day 134 |
+| **Last Updated** | 2026-04-01 10:05:30 UTC |
+| **Total Commits** | 163 |
 | **Started** | 2026-02-17 |
 | **Live Page** | [asbinthapa99.github.io/shell](https://asbinthapa99.github.io/shell) |
 
@@ -18,7 +18,7 @@
 
 ## Quote of the Day
 
-> Words used to attract the dull of wit are not to be relied on. - Huang Po
+> Chase your passion, not your pension.  - Denis Waitley
 
 ---
 
@@ -31,6 +31,7 @@
 | Day 131 | 2026-04-01 00:45:13 | Morning | I don't ever give up. I'd have to be dead or completely incapacitated. - Elon Musk |
 | Day 132 | 2026-04-01 01:03:05 | Morning | Life is a balance of holding on and letting go. - Rumi |
 | Day 133 | 2026-04-01 01:11:35 | Morning | Words used to attract the dull of wit are not to be relied on. - Huang Po |
+| Day 134 | 2026-04-01 10:05:30 | Morning | Chase your passion, not your pension.  - Denis Waitley |
 
 ---
 
