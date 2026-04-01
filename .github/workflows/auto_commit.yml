@@ -43,7 +43,6 @@ jobs:
               DAY=1
             fi
             echo $DAY > day_count.txt
-
             RESPONSE=$(curl -sf https://zenquotes.io/api/random || echo "")
             if [ -n "$RESPONSE" ]; then
               QUOTE=$(echo "$RESPONSE" | python3 -c "import sys,json; d=json.load(sys.stdin)[0]; print(d['q'])")
@@ -55,6 +54,7 @@ jobs:
             CONTENT_LABEL="Quote of the Day"
             CONTENT_VALUE="$QUOTE - $AUTHOR"
             COMMIT_MSG="Day $DAY | Morning | $QUOTE - $AUTHOR"
+            BTC_PRICE="N/A"
 
           # ── Midday: bitcoin price ─────────────────────────────────────────
           elif [ "$HOUR" -lt 13 ]; then
@@ -68,8 +68,10 @@ jobs:
               BTC_PRICE="unavailable"
               BTC_TIME="unavailable"
             fi
+            QUOTE="Live Bitcoin price fetched from CoinDesk API"
+            AUTHOR="CoinDesk"
             CONTENT_LABEL="Bitcoin Price"
-            CONTENT_VALUE="BTC $BTC_PRICE USD — $BTC_TIME"
+            CONTENT_VALUE="BTC $BTC_PRICE USD as of $BTC_TIME"
             COMMIT_MSG="Day $DAY | Midday | BTC $BTC_PRICE USD"
 
           # ── Afternoon: random word ────────────────────────────────────────
@@ -88,9 +90,12 @@ jobs:
             else
               DEF="No definition found."
             fi
+            QUOTE="$WORD"
+            AUTHOR="$DEF"
             CONTENT_LABEL="Word of the Session"
-            CONTENT_VALUE="$WORD — $DEF"
+            CONTENT_VALUE="$WORD - $DEF"
             COMMIT_MSG="Day $DAY | Afternoon | Word: $WORD"
+            BTC_PRICE="N/A"
 
           # ── Evening: bitcoin price ────────────────────────────────────────
           elif [ "$HOUR" -lt 19 ]; then
@@ -104,8 +109,10 @@ jobs:
               BTC_PRICE="unavailable"
               BTC_TIME="unavailable"
             fi
+            QUOTE="Live Bitcoin price fetched from CoinDesk API"
+            AUTHOR="CoinDesk"
             CONTENT_LABEL="Bitcoin Price"
-            CONTENT_VALUE="BTC $BTC_PRICE USD — $BTC_TIME"
+            CONTENT_VALUE="BTC $BTC_PRICE USD as of $BTC_TIME"
             COMMIT_MSG="Day $DAY | Evening | BTC $BTC_PRICE USD"
 
           # ── Night: random word ────────────────────────────────────────────
@@ -124,16 +131,31 @@ jobs:
             else
               DEF="No definition found."
             fi
+            QUOTE="$WORD"
+            AUTHOR="$DEF"
             CONTENT_LABEL="Word of the Session"
-            CONTENT_VALUE="$WORD — $DEF"
+            CONTENT_VALUE="$WORD - $DEF"
             COMMIT_MSG="Day $DAY | Night | Word: $WORD"
+            BTC_PRICE="N/A"
           fi
+
+          # ── Export all vars ───────────────────────────────────────────────
+          echo "DAY=$DAY"                       >> "$GITHUB_ENV"
+          echo "NOW=$NOW"                       >> "$GITHUB_ENV"
+          echo "LABEL=$LABEL"                   >> "$GITHUB_ENV"
+          echo "QUOTE=$QUOTE"                   >> "$GITHUB_ENV"
+          echo "AUTHOR=$AUTHOR"                 >> "$GITHUB_ENV"
+          echo "CONTENT_LABEL=$CONTENT_LABEL"   >> "$GITHUB_ENV"
+          echo "CONTENT_VALUE=$CONTENT_VALUE"   >> "$GITHUB_ENV"
+          echo "BTC_PRICE=$BTC_PRICE"           >> "$GITHUB_ENV"
+          echo "COMMIT_MSG=$COMMIT_MSG"         >> "$GITHUB_ENV"
 
           # ── Write commit log ──────────────────────────────────────────────
           echo "| Day $DAY | $NOW | $LABEL | $CONTENT_VALUE |" >> commit_log.txt
 
           # ── Build README ──────────────────────────────────────────────────
           TOTAL=$(git rev-list --count HEAD)
+          echo "TOTAL=$TOTAL" >> "$GITHUB_ENV"
           {
             echo "# Streak Tracker"
             echo ""
@@ -149,6 +171,7 @@ jobs:
             echo "| **Last Updated** | $NOW UTC |"
             echo "| **Total Commits** | $TOTAL |"
             echo "| **Started** | 2026-02-17 |"
+            echo "| **Live Page** | [asbinthapa99.github.io/shell](https://asbinthapa99.github.io/shell) |"
             echo ""
             echo "---"
             echo ""
@@ -169,12 +192,23 @@ jobs:
             echo "*Daily consistency challenge. Powered by GitHub Actions.*"
           } > README.md
 
-          # ── Export for commit step ────────────────────────────────────────
-          echo "COMMIT_MSG=$COMMIT_MSG" >> "$GITHUB_ENV"
+      - name: Build GitHub Pages site
+        run: |
+          python3 build_page.py
+        env:
+          DAY: ${{ env.DAY }}
+          NOW: ${{ env.NOW }}
+          LABEL: ${{ env.LABEL }}
+          QUOTE: ${{ env.QUOTE }}
+          AUTHOR: ${{ env.AUTHOR }}
+          CONTENT_LABEL: ${{ env.CONTENT_LABEL }}
+          CONTENT_VALUE: ${{ env.CONTENT_VALUE }}
+          BTC_PRICE: ${{ env.BTC_PRICE }}
+          TOTAL: ${{ env.TOTAL }}
 
       - name: Commit and push
         run: |
-          git add day_count.txt README.md commit_log.txt
+          git add day_count.txt README.md commit_log.txt index.html
           git diff --staged --quiet && exit 0
           git commit -m "$COMMIT_MSG"
           git push https://asbinthapa99:${{ secrets.GH_PAT }}@github.com/asbinthapa99/shell.git HEAD:main
