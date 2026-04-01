@@ -4,22 +4,28 @@
 <dict>
     <key>Label</key>
     <string>com.user.autocommit.daemon</string>
-    
+
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string>
         <string>/Users/user/shell/auto_commit.sh</string>
     </array>
-    
-    <key>StartInterval</key>
-    <integer>39600</integer>
-    
+
+    <!-- Run once daily at 9:00 AM local time -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>9</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
     <key>StandardOutPath</key>
-    <string>/Users/user/shell/auto_commit.sh.log</string>
-    
+    <string>/Users/user/shell/auto_commit.log</string>
+
     <key>StandardErrorPath</key>
-    <string>/Users/user/shell/auto_commit.sh.log</string>
-    
+    <string>/Users/user/shell/auto_commit.log</string>
+
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
@@ -27,12 +33,11 @@
         <key>HOME</key>
         <string>/Users/user</string>
     </dict>
-    
+
     <key>RunAtLoad</key>
-    <true/>
-    
+    <false/>
+
     <key>User</key>
     <string>user</string>
-    
 </dict>
 </plist>
