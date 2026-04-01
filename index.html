@@ -1,176 +1,516 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta http-equiv="refresh" content="300"/>
-  <title>Asbin's Streak Tracker</title>
+  <title>Asbin · Streak Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
   <style>
+    :root {
+      --bg:        #080b10;
+      --surface:   #0e1318;
+      --border:    #1a2030;
+      --accent:    #00e5ff;
+      --accent2:   #ff6b35;
+      --btc:       #f7931a;
+      --text:      #dde6f0;
+      --muted:     #4a5568;
+      --green:     #00ff88;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
+      font-family: 'Space Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
     }
+
+    /* ── Animated grid background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Glow orbs ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -200px;
+      right: -200px;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .orb2 {
+      position: fixed;
+      bottom: -200px;
+      left: -100px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255,107,53,0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout ── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    /* ── Header ── */
     header {
-      background: #161b22;
-      border-bottom: 1px solid #30363d;
-      padding: 2.5rem 1rem;
+      padding: 4rem 0 3rem;
       text-align: center;
+      animation: fadeDown 0.8s ease both;
     }
-    header .fire { font-size: 3rem; }
-    header h1 { font-size: 2rem; color: #58a6ff; margin-top: 0.5rem; }
-    header p  { color: #8b949e; margin-top: 0.5rem; font-size: 0.95rem; }
-    .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+
+    .logo-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 1rem;
-      margin-bottom: 2rem;
-    }
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 1.25rem;
-      text-align: center;
-    }
-    .card .label { font-size: 0.72rem; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
-    .card .value { font-size: 1.8rem; font-weight: 700; color: #58a6ff; margin-top: 0.25rem; }
-    .card .sub   { font-size: 0.8rem; color: #8b949e; margin-top: 0.25rem; }
-    .section {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    .section h2 {
-      font-size: 0.78rem;
-      color: #8b949e;
-      text-transform: uppercase;
-      letter-spacing: 1px;
       margin-bottom: 1rem;
-      border-bottom: 1px solid #30363d;
-      padding-bottom: 0.5rem;
     }
-    .quote-text   { font-size: 1.15rem; color: #e6edf3; line-height: 1.7; font-style: italic; }
-    .quote-author { color: #58a6ff; margin-top: 0.75rem; font-size: 0.9rem; }
-    .btc-price    { font-size: 2.2rem; font-weight: 700; color: #f7931a; }
-    table  { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th     { text-align: left; padding: 0.6rem 0.75rem; color: #8b949e; border-bottom: 1px solid #30363d; }
-    td     { padding: 0.6rem 0.75rem; border-bottom: 1px solid #21262d; color: #c9d1d9; vertical-align: top; }
+
+    .fire-icon {
+      font-size: 2.5rem;
+      animation: flicker 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes flicker {
+      0%   { transform: scale(1) rotate(-2deg); filter: brightness(1); }
+      100% { transform: scale(1.1) rotate(2deg); filter: brightness(1.2); }
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 0.75rem;
+    }
+
+    .tagline span {
+      color: var(--accent);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--accent), var(--border), transparent);
+      margin: 0 0 3rem;
+      opacity: 0.6;
+    }
+
+    /* ── Stats grid ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s ease 0.1s both;
+    }
+
+    .stat {
+      background: var(--surface);
+      padding: 2rem 1.5rem;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .stat:hover { background: #121820; }
+
+    .stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .stat:hover::before { opacity: 1; }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-value.btc { color: var(--btc); font-size: 1.4rem; }
+    .stat-value.session { color: #ffffff; font-size: 1.6rem; }
+
+    .stat-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    /* ── Content card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.8s ease 0.2s both;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--accent2) 70%, transparent);
+      opacity: 0.5;
+    }
+
+    .card-label {
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-label::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    /* ── Quote ── */
+    .quote-text {
+      font-size: 1.25rem;
+      line-height: 1.8;
+      color: #ffffff;
+      font-style: italic;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+
+    .quote-text::before {
+      content: '"';
+      position: absolute;
+      left: 0;
+      top: -0.5rem;
+      font-size: 3rem;
+      color: var(--accent);
+      font-family: 'Syne', sans-serif;
+      line-height: 1;
+      opacity: 0.4;
+    }
+
+    .quote-author {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: var(--accent2);
+      padding-left: 1.5rem;
+    }
+
+    /* ── BTC display ── */
+    .btc-display {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--btc);
+      letter-spacing: -1px;
+    }
+
+    .btc-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      animation: fadeUp 0.8s ease 0.3s both;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    td {
+      padding: 0.9rem 1rem;
+      border-bottom: 1px solid #0e1318;
+      color: #8899aa;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
     tr:last-child td { border-bottom: none; }
-    .badge {
-      background: #1f6feb22;
-      color: #58a6ff;
-      border: 1px solid #1f6feb55;
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 0.75rem;
+
+    tr:hover td {
+      background: #0e1318;
+      color: var(--text);
+    }
+
+    td:first-child {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      color: var(--accent);
       white-space: nowrap;
     }
+
+    td:nth-child(2) {
+      white-space: nowrap;
+      font-size: 0.75rem;
+    }
+
+    .badge {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    /* ── Footer ── */
     footer {
       text-align: center;
-      color: #8b949e;
-      font-size: 0.8rem;
-      padding: 2rem 1rem;
-      border-top: 1px solid #21262d;
-      margin-top: 1rem;
+      padding: 3rem 0 1rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+      animation: fadeUp 0.8s ease 0.4s both;
     }
-    footer a { color: #58a6ff; text-decoration: none; }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
     footer a:hover { text-decoration: underline; }
+
+    .footer-dot { margin: 0 0.75rem; opacity: 0.3; }
+
+    /* ── Live indicator ── */
+    .live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-top: 0.5rem;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Counter animation ── */
+    .count-up {
+      display: inline-block;
+      animation: countUp 1s ease both;
+    }
+
+    @keyframes countUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
+<div class="orb2"></div>
+
+<div class="wrap">
 
   <header>
-    <div class="fire">🔥</div>
-    <h1>Asbin's Streak Tracker</h1>
-    <p>Automatically updated 5 times daily &nbsp;·&nbsp; Powered by GitHub Actions</p>
+    <div class="logo-line">
+      <span class="fire-icon">🔥</span>
+      <h1>Streak Tracker</h1>
+      <span class="fire-icon">🔥</span>
+    </div>
+    <p class="tagline">Asbin Thapa &nbsp;·&nbsp; <span>Day 133</span> &nbsp;·&nbsp; Never missing a commit</p>
+    <div class="live" style="justify-content:center; margin-top:1rem;">
+      <span class="live-dot"></span>
+      live — updates 5× daily
+    </div>
   </header>
 
-  <div class="container">
+  <div class="divider"></div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="label">Current Day</div>
-        <div class="value">132</div>
-        <div class="sub">days straight</div>
-      </div>
-      <div class="card">
-        <div class="label">Total Commits</div>
-        <div class="value">160</div>
-        <div class="sub">and counting</div>
-      </div>
-      <div class="card">
-        <div class="label">Bitcoin</div>
-        <div class="value" style="color:#f7931a; font-size:1.1rem;">$N/A</div>
-        <div class="sub">USD live</div>
-      </div>
-      <div class="card">
-        <div class="label">Session</div>
-        <div class="value" style="font-size:1.1rem;">Morning</div>
-        <div class="sub">2026-04-01 01:03:05 UTC</div>
-      </div>
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Current Day</div>
+      <div class="stat-value count-up">133</div>
+      <div class="stat-sub">days straight 🔥</div>
     </div>
-
-    <div class="section">
-      <h2>Quote of the Day</h2>
-      <div class="quote-text">"Life is a balance of holding on and letting go."</div>
-      <div class="quote-author">— Rumi</div>
+    <div class="stat">
+      <div class="stat-label">Total Commits</div>
+      <div class="stat-value count-up">162</div>
+      <div class="stat-sub">and counting</div>
     </div>
+    <div class="stat">
+      <div class="stat-label">Bitcoin Price</div>
+      <div class="stat-value btc">$N/A</div>
+      <div class="stat-sub">USD · live via CoinDesk</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Session</div>
+      <div class="stat-value session">Morning</div>
+      <div class="stat-sub">2026-04-01 01:11:35 UTC</div>
+    </div>
+  </div>
 
-    <div class="section">
-      <h2>Recent Commit Log</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Day</th>
-            <th>Timestamp</th>
-            <th>Session</th>
-            <th>Content</th>
-          </tr>
-        </thead>
-        <tbody>
-          
-            <tr>
+  <div class="card">
+    <div class="card-label">Quote of the Day</div>
+    <div class="quote-text">Words used to attract the dull of wit are not to be relied on.</div>
+    <div class="quote-author">— Huang Po</div>
+  </div>
+
+  <div class="card table-wrap">
+    <div class="card-label">Recent Commit Log</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Timestamp</th>
+          <th>Session</th>
+          <th>Content</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
               <td>Day 129</td>
               <td>2026-04-01 00:32:28</td>
-              <td><span class='badge'>Morning</span></td>
+              <td><span class="badge">Morning</span></td>
               <td>Where there is anger, there is always pain underneath. — Eckhart Tolle</td>
-            </tr>
-            <tr>
+            </tr><tr>
               <td>Day 130</td>
               <td>2026-04-01 00:42:09</td>
-              <td><span class='badge'>Morning</span></td>
+              <td><span class="badge">Morning</span></td>
               <td>20 percent of your activities will account for 80 percent of your results. - Brian Tracy</td>
-            </tr>
-            <tr>
+            </tr><tr>
               <td>Day 131</td>
               <td>2026-04-01 00:45:13</td>
-              <td><span class='badge'>Morning</span></td>
+              <td><span class="badge">Morning</span></td>
               <td>I don't ever give up. I'd have to be dead or completely incapacitated. - Elon Musk</td>
-            </tr>
-            <tr>
+            </tr><tr>
               <td>Day 132</td>
               <td>2026-04-01 01:03:05</td>
-              <td><span class='badge'>Morning</span></td>
+              <td><span class="badge">Morning</span></td>
               <td>Life is a balance of holding on and letting go. - Rumi</td>
+            </tr><tr>
+              <td>Day 133</td>
+              <td>2026-04-01 01:11:35</td>
+              <td><span class="badge">Morning</span></td>
+              <td>Words used to attract the dull of wit are not to be relied on. - Huang Po</td>
             </tr>
-        </tbody>
-      </table>
-    </div>
-
+      </tbody>
+    </table>
   </div>
 
   <footer>
-    Last updated: 2026-04-01 01:03:05 UTC &nbsp;·&nbsp;
-    <a href="https://github.com/asbinthapa99/shell">View on GitHub</a>
-    &nbsp;·&nbsp;
-    <a href="https://github.com/asbinthapa99">@asbinthapa99</a>
+    <div>Last updated: 2026-04-01 01:11:35 UTC</div>
+    <div style="margin-top:0.5rem;">
+      <a href="https://github.com/asbinthapa99/shell">shell repo</a>
+      <span class="footer-dot">·</span>
+      <a href="https://github.com/asbinthapa99">@asbinthapa99</a>
+      <span class="footer-dot">·</span>
+      <a href="https://asbinthapa.info.np">asbinthapa.info.np</a>
+    </div>
+    <div style="margin-top:1rem; opacity:0.4; font-size:0.65rem; letter-spacing:2px;">
+      POWERED BY GITHUB ACTIONS · UBUNTU RUNNER · FREE TIER
+    </div>
   </footer>
 
+</div>
 </body>
 </html>
