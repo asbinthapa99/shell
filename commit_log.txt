@@ -12,3 +12,4 @@
 | Day 135 | 2026-04-02 12:44:13 | Midday | BTC unavailable USD as of unavailable |
 | Day 135 | 2026-04-02 16:00:28 | Evening | BTC unavailable USD as of unavailable |
 | Day 135 | 2026-04-02 18:58:05 | Evening | BTC unavailable USD as of unavailable |
+| Day 135 | 2026-04-02 21:41:05 | Night | consistency - Local coherence. |
