@@ -8,17 +8,17 @@
 
 | | |
 |---|---|
-| **Current Day** | Day 134 |
-| **Last Updated** | 2026-04-01 21:45:12 UTC |
-| **Total Commits** | 167 |
+| **Current Day** | Day 135 |
+| **Last Updated** | 2026-04-02 10:01:16 UTC |
+| **Total Commits** | 168 |
 | **Started** | 2026-02-17 |
 | **Live Page** | [asbinthapa99.github.io/shell](https://asbinthapa99.github.io/shell) |
 
 ---
 
-## Word of the Session
+## Quote of the Day
 
-> wracked - To place in or hang on a rack.
+> Do the hard jobs first. The easy jobs will take care of themselves. - Dale Carnegie
 
 ---
 
@@ -26,7 +26,6 @@
 
 | Day | Timestamp | Session | Content |
 |-----|-----------|---------|---------|
-| Day 129 | 2026-04-01 00:32:28 | Morning | Where there is anger, there is always pain underneath. — Eckhart Tolle |
 | Day 130 | 2026-04-01 00:42:09 | Morning | 20 percent of your activities will account for 80 percent of your results. - Brian Tracy |
 | Day 131 | 2026-04-01 00:45:13 | Morning | I don't ever give up. I'd have to be dead or completely incapacitated. - Elon Musk |
 | Day 132 | 2026-04-01 01:03:05 | Morning | Life is a balance of holding on and letting go. - Rumi |
@@ -36,6 +35,7 @@
 | Day 134 | 2026-04-01 16:05:37 | Evening | BTC unavailable USD as of unavailable |
 | Day 134 | 2026-04-01 19:03:30 | Night | prevocalic - Immediately preceding a vowel or vowel sound |
 | Day 134 | 2026-04-01 21:45:12 | Night | wracked - To place in or hang on a rack. |
+| Day 135 | 2026-04-02 10:01:16 | Morning | Do the hard jobs first. The easy jobs will take care of themselves. - Dale Carnegie |
 
 ---
 
