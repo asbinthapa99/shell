@@ -9,16 +9,16 @@
 | | |
 |---|---|
 | **Current Day** | Day 136 |
-| **Last Updated** | 2026-04-03 18:50:04 UTC |
-| **Total Commits** | 176 |
+| **Last Updated** | 2026-04-03 21:37:35 UTC |
+| **Total Commits** | 177 |
 | **Started** | 2026-02-17 |
 | **Live Page** | [asbinthapa99.github.io/shell](https://asbinthapa99.github.io/shell) |
 
 ---
 
-## Bitcoin Price
+## Word of the Session
 
-> BTC unavailable USD as of unavailable
+> straw - A dried stalk of a cereal plant.
 
 ---
 
@@ -26,7 +26,6 @@
 
 | Day | Timestamp | Session | Content |
 |-----|-----------|---------|---------|
-| Day 134 | 2026-04-01 21:45:12 | Night | wracked - To place in or hang on a rack. |
 | Day 135 | 2026-04-02 10:01:16 | Morning | Do the hard jobs first. The easy jobs will take care of themselves. - Dale Carnegie |
 | Day 135 | 2026-04-02 12:44:13 | Midday | BTC unavailable USD as of unavailable |
 | Day 135 | 2026-04-02 16:00:28 | Evening | BTC unavailable USD as of unavailable |
@@ -36,6 +35,7 @@
 | Day 136 | 2026-04-03 12:36:22 | Midday | BTC unavailable USD as of unavailable |
 | Day 136 | 2026-04-03 15:38:42 | Afternoon | perseverance - Continuing in a course of action without regard to discouragement, opposition or previous failure. |
 | Day 136 | 2026-04-03 18:50:04 | Evening | BTC unavailable USD as of unavailable |
+| Day 136 | 2026-04-03 21:37:35 | Night | straw - A dried stalk of a cereal plant. |
 
 ---
 
