@@ -470,7 +470,7 @@ html = f"""<!DOCTYPE html>
     <div class="stat">
       <div class="stat-label">Bitcoin Price</div>
       <div class="stat-value btc">${btc_price}</div>
-      <div class="stat-sub">USD · live via CoinDesk</div>
+      <div class="stat-sub">USD · live via CoinGecko</div>
     </div>
     <div class="stat">
       <div class="stat-label">Session</div>
