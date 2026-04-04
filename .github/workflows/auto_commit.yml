@@ -60,10 +60,10 @@ jobs:
           elif [ "$HOUR" -lt 13 ]; then
             LABEL="Midday"
             DAY=$(cat day_count.txt)
-            BTC=$(curl -sf "https://api.coindesk.com/v1/bpi/currentprice/USD.json" || echo "")
+            BTC=$(curl -sf "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd" || echo "")
             if [ -n "$BTC" ]; then
-              BTC_PRICE=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['bpi']['USD']['rate'])")
-              BTC_TIME=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['time']['updated'])")
+              BTC_PRICE=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print('{:,.0f}'.format(d['bitcoin']['usd']))")
+              BTC_TIME=$(date '+%b %d %Y %H:%M:%S UTC')
             else
               BTC_PRICE="unavailable"
               BTC_TIME="unavailable"
@@ -101,10 +101,10 @@ jobs:
           elif [ "$HOUR" -lt 19 ]; then
             LABEL="Evening"
             DAY=$(cat day_count.txt)
-            BTC=$(curl -sf "https://api.coindesk.com/v1/bpi/currentprice/USD.json" || echo "")
+            BTC=$(curl -sf "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd" || echo "")
             if [ -n "$BTC" ]; then
-              BTC_PRICE=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['bpi']['USD']['rate'])")
-              BTC_TIME=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['time']['updated'])")
+              BTC_PRICE=$(echo "$BTC" | python3 -c "import sys,json; d=json.load(sys.stdin); print('{:,.0f}'.format(d['bitcoin']['usd']))")
+              BTC_TIME=$(date '+%b %d %Y %H:%M:%S UTC')
             else
               BTC_PRICE="unavailable"
               BTC_TIME="unavailable"
